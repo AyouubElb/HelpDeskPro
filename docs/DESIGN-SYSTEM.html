@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HelpDeskPro — Design system</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;600&family=Public+Sans:wght@400;600;700&display=swap">
+<style>
+:root {
+  --page-bg: #F2F3F6; --page-muted: #5C5F73; --page-line: #DADCE4; --page-card: #FBFBFD;
+  --head: "Martian Mono", ui-monospace, "Cascadia Mono", monospace;
+  --text: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --paper: #F4F5F8; --card: #FDFDFE; --ink: #1A1B2E; --pencil: #5C5F73; --line: #E1E3EA; --field: #8F92A6; --muted: #EDEEF2;
+  --main: #6050DC; --main-h: #4F40C4; --tint: #EEEBFD; --main-t: #3F35B5; --green: #13703F; --red: #B42318;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page-bg); color: var(--ink); font-family: var(--text); }
+a { color: var(--main-t); }
+a:hover { color: #2E2690; }
+
+/* Documentation page */
+.wrap { max-width: 1240px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 40px) 64px; display: grid; gap: 26px; }
+.eyebrow { margin: 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--page-muted); }
+.doc-h1 { margin: 6px 0 0; font-family: var(--head); font-weight: 600; font-size: clamp(24px, 3.2vw, 32px); line-height: 1.2; letter-spacing: -.01em; }
+.doc-h2 { margin: 0; font-family: var(--head); font-weight: 600; font-size: 19px; }
+.doc-h3 { margin: 0; font-family: var(--head); font-weight: 600; font-size: 14px; }
+.lede { margin: 10px 0 0; max-width: 72ch; color: var(--page-muted); line-height: 1.55; font-size: 15px; }
+.note { margin: 0; color: var(--page-muted); font-size: 14px; line-height: 1.55; max-width: 76ch; }
+.chips { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.chips li { padding: 5px 12px; border: 1px solid var(--page-line); border-radius: 4px; font-size: 12.5px; background: var(--page-card); }
+.chips b { font-family: var(--head); font-size: 11px; font-weight: 600; margin-right: 6px; color: var(--page-muted); }
+.section { background: var(--page-card); border: 1px solid var(--page-line); border-radius: 6px; padding: 22px; display: grid; gap: 16px; min-width: 0; }
+.screen { border: 1px solid var(--page-line); border-radius: 6px; overflow: hidden; background: var(--page-card); min-width: 0; }
+.screen-cap { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 14px; font-size: 12.5px; color: var(--page-muted); border-bottom: 1px solid var(--page-line); }
+.screen-cap b { color: var(--ink); font-family: var(--head); font-size: 12.5px; font-weight: 600; }
+.tokens { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
+.token { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: center; }
+.token i { width: 34px; height: 34px; border-radius: 4px; border: 1px solid var(--page-line); display: block; }
+.token b { display: block; font-size: 13px; }
+.token code { font-family: var(--head); font-size: 11px; color: var(--page-muted); }
+.token small { display: block; font-size: 12px; color: var(--page-muted); }
+.families { display: grid; background: var(--card); border: 1px solid var(--line); border-radius: 4px; }
+.family { display: grid; grid-template-columns: 22px minmax(120px, 190px) minmax(0, 1fr); gap: 14px; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.family:last-child { border-bottom: 0; }
+.family .sq { width: 18px; height: 18px; border-radius: 3px; display: block; }
+.family .name { font-family: var(--head); font-size: 12px; font-weight: 600; }
+.family .name span { display: block; font-family: var(--text); font-weight: 400; font-size: 12.5px; color: var(--pencil); margin-top: 2px; }
+.set { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+@media (max-width: 640px) { .family { grid-template-columns: 22px minmax(0, 1fr); } .family .set { grid-column: 1 / -1; } }
+.scale { display: grid; background: var(--page-card); border: 1px solid var(--page-line); border-radius: 4px; }
+.scale-row { display: grid; grid-template-columns: minmax(130px, 210px) minmax(0, 1fr) minmax(150px, 240px); gap: 16px; align-items: baseline; padding: 12px 14px; border-bottom: 1px solid var(--page-line); }
+.scale-row:last-child { border-bottom: 0; }
+.scale-row .role { font-size: 12.5px; color: var(--page-muted); }
+.scale-row .spec { font-family: var(--head); font-size: 11px; color: var(--page-muted); }
+.scale-row .sample { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 720px) { .scale-row { grid-template-columns: minmax(0, 1fr); gap: 4px; } }
+.rulecards { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); }
+.rulecard { border: 1px solid var(--page-line); border-radius: 4px; padding: 12px; display: grid; gap: 6px; background: var(--card); }
+.rulecard b { font-size: 13px; }
+.rulecard .ex { font-size: 16px; font-variant-numeric: tabular-nums; }
+.rulecard small { color: var(--page-muted); font-size: 12.5px; line-height: 1.5; }
+.scale-bar { display: flex; align-items: flex-end; gap: 6px; flex-wrap: wrap; }
+.scale-bar span { display: grid; justify-items: center; gap: 4px; font-family: var(--head); font-size: 10.5px; color: var(--page-muted); }
+.scale-bar i { display: block; background: var(--main); border-radius: 2px; width: 14px; }
+.board { border: 1px solid var(--line); border-radius: 4px; padding: 18px 18px 18px 56px; display: grid; gap: 18px; min-width: 0; }
+.board-cap { margin: 0 0 8px; font-family: var(--head); font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--pencil); }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.grid-2 { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); align-items: start; }
+.btn-desc { display: grid; gap: 6px; justify-items: start; }
+.btn-desc small { font-size: 12px; color: var(--pencil); max-width: 24ch; line-height: 1.4; }
+.lex { width: 100%; border-collapse: collapse; font-size: 13.5px; background: var(--card); border: 1px solid var(--line); }
+.lex th { text-align: left; font-family: var(--head); font-weight: 600; font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; padding: 9px 12px; border-bottom: 3px double var(--ink); white-space: nowrap; }
+.lex td { padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.lex tr:last-child td { border-bottom: 0; }
+.lex td:first-child { font-weight: 700; white-space: nowrap; }
+.lex .never { color: var(--pencil); text-decoration: line-through; text-decoration-color: var(--red); }
+.rules { margin: 0; padding-left: 20px; display: grid; gap: 8px; line-height: 1.55; font-size: 14px; max-width: 80ch; }
+.scroll { overflow-x: auto; }
+
+/* Product */
+.prod { font-family: var(--text); font-size: 14px; line-height: 1.5; color: var(--ink); }
+.ruled {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(90deg, transparent 29px, rgba(198, 52, 52, .45) 29px, rgba(198, 52, 52, .45) 30px, transparent 30px),
+    repeating-linear-gradient(180deg, transparent 0 23px, rgba(96, 80, 220, .09) 23px 24px);
+}
+.frame { display: flex; flex-wrap: wrap; min-height: 560px; position: relative; }
+.side { flex: 1 1 220px; background: var(--card); border-right: 1px solid var(--line); padding: 16px 12px; display: flex; flex-direction: column; gap: 14px; font-size: 13.5px; }
+.brand { display: grid; gap: 6px; padding: 0 6px; }
+.logo { justify-self: start; font-family: var(--head); font-weight: 600; font-size: 14px; color: var(--main-t); border: 1.5px solid var(--main-t); border-radius: 3px; padding: 2px 8px; }
+.org { font-size: 12px; color: var(--pencil); }
+.nav { display: grid; gap: 2px; }
+.nav a { color: var(--ink); text-decoration: none; padding: 6px 8px; border-radius: 4px; }
+.nav a:hover { background: var(--paper); }
+.nav a.on { background: var(--tint); color: var(--main-t); font-weight: 600; }
+.me { margin-top: auto; padding: 10px 8px 0; border-top: 1px solid var(--line); display: grid; gap: 2px; }
+.me span { font-size: 12px; color: var(--pencil); }
+.me a { font-size: 12.5px; margin-top: 4px; font-weight: 600; }
+.main { flex: 999 1 560px; min-width: 0; padding: 24px 32px 32px 56px; display: grid; gap: 16px; align-content: start; }
+.head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.crumb { margin: 0 0 4px; font-size: 12px; color: var(--pencil); }
+.crumb a { font-weight: 600; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
+.h-title { margin: 0; font-family: var(--head); font-weight: 600; font-size: 22px; letter-spacing: -.015em; line-height: 1.25; }
+.sub { margin: 4px 0 0; color: var(--pencil); font-size: 13px; }
+.trow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btn { font: inherit; font-weight: 600; font-size: 13px; line-height: 1.2; padding: 8px 13px; border-radius: 4px; border: 1.5px solid var(--ink); background: var(--card); color: var(--ink); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 7px; text-decoration: none; transition: transform .1s ease, box-shadow .1s ease, background-color .15s ease; }
+.btn:hover { color: var(--ink); }
+.btn svg { width: 15px; height: 15px; }
+.btn.pri { background: var(--main); color: #FFFFFF; box-shadow: 2px 2px 0 var(--ink); }
+.btn.pri:hover { background: var(--main-h); color: #FFFFFF; }
+.btn.pri:active, .btn.danfill:active { transform: translate(2px, 2px); box-shadow: none; }
+.btn.dan, .btn.dan:hover { color: var(--red); border-color: var(--red); }
+.btn.danfill, .btn.danfill:hover { background: var(--red); color: #FFFFFF; box-shadow: 2px 2px 0 var(--ink); }
+.btn.icon { padding: 8px; }
+.btn.wide { width: 100%; }
+.btn[disabled] { background: var(--muted); color: var(--pencil); border-color: var(--field); box-shadow: none; cursor: not-allowed; }
+.btn:focus-visible { outline: 2px solid var(--main); outline-offset: 3px; }
+.spin { width: 13px; height: 13px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .45); border-top-color: #FFFFFF; animation: spin .9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 4px; min-width: 0; }
+.field { display: grid; gap: 6px; min-width: 0; border: 0; margin: 0; padding: 0; }
+.field label, .field legend { font-weight: 600; font-size: 13px; padding: 0; }
+.field small { color: var(--pencil); font-size: 12px; }
+.field-error { margin: 0; color: var(--red); font-size: 12px; }
+.input, .select, .area { font: inherit; font-size: 14px; width: 100%; padding: 8px 10px; border: 1.5px solid var(--field); border-radius: 4px; background: var(--card); color: var(--ink); min-width: 0; }
+.area { min-height: 110px; resize: vertical; line-height: 1.5; }
+.input:focus, .select:focus, .area:focus, .focus { outline: none; border-color: var(--main); box-shadow: 0 0 0 3px var(--tint); }
+.input.invalid { border-color: var(--red); }
+.input[disabled] { background: var(--muted); color: var(--pencil); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.stamp { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 2px 6px; border: 1.5px solid currentColor; border-radius: 3px; white-space: nowrap; background: var(--card); line-height: 1.3; }
+.s-open { color: var(--pencil); border-style: dashed; }
+.s-prog { color: var(--main-t); }
+.s-done { color: var(--green); }
+.s-closed { color: var(--pencil); }
+.s-late { color: var(--red); }
+.met { color: var(--green); font-weight: 600; }
+.missed { color: var(--pencil); }
+.muted { color: var(--pencil); }
+.due { display: inline-flex; align-items: center; gap: 8px; }
+.prio { display: inline-flex; align-items: center; gap: 7px; }
+.bars { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; }
+.bars i { display: block; width: 3px; background: var(--line); border-radius: 1px; }
+.bars i:nth-child(1) { height: 5px; }
+.bars i:nth-child(2) { height: 8px; }
+.bars i:nth-child(3) { height: 12px; }
+.bars i.f { background: currentColor; }
+.tabs { display: flex; gap: 2px; flex-wrap: wrap; border-bottom: 1.5px solid var(--line); }
+.tab { font: inherit; font-size: 13px; font-weight: 600; background: none; border: 0; border-bottom: 2.5px solid transparent; margin-bottom: -1.5px; padding: 7px 10px; color: var(--pencil); cursor: pointer; }
+.tab.on { color: var(--main-t); border-bottom-color: var(--main); }
+.tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.search { position: relative; flex: 1 1 300px; }
+.search svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--pencil); pointer-events: none; }
+.search .input { padding-left: 33px; }
+.tools .select { width: auto; flex: 0 1 210px; }
+.tbl-wrap { overflow-x: auto; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.tbl th { text-align: left; font-family: var(--head); font-weight: 600; font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; padding: 9px 12px; border-bottom: 3px double var(--ink); white-space: nowrap; }
+.tbl td { padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: middle; }
+.tbl tbody tr:last-child td { border-bottom: 0; }
+.tbl tbody tr:hover td { background: #F7F7FB; }
+.tbl .t { white-space: normal; min-width: 260px; }
+.tl { color: var(--ink); font-weight: 600; text-decoration: none; }
+.tl:hover { color: var(--main-t); text-decoration: underline; text-underline-offset: 3px; }
+.pager { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12.5px; color: var(--pencil); font-variant-numeric: tabular-nums; }
+.pages { display: flex; gap: 4px; }
+.pg { font: inherit; font-size: 12.5px; min-width: 30px; padding: 5px 9px; border-radius: 4px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+.pg.on { border-color: var(--main); background: var(--main); color: #FFFFFF; }
+.tiles { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); }
+.tile { padding: 14px; display: grid; gap: 5px; }
+.t-l { font-size: 12.5px; color: var(--pencil); }
+.t-n { font-size: 24px; font-weight: 700; letter-spacing: -.01em; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.t-s { font-size: 12.5px; color: var(--pencil); }
+.t-s a { font-weight: 600; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
+.tile.late { border-color: var(--red); }
+.tile.late .t-n { color: var(--red); }
+.cols { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); align-items: start; }
+.panel { padding: 14px; display: grid; gap: 10px; font-size: 13px; }
+.cap { margin: 0; font-family: var(--head); font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+.hint { margin: -4px 0 0; font-size: 12px; color: var(--pencil); }
+.list { list-style: none; margin: 0; padding: 0; display: grid; }
+.rank { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.rank .n { font-family: var(--head); font-size: 12px; color: var(--pencil); }
+.rank .c { font-weight: 600; }
+.rec { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.rank:last-child, .rec:last-child { border-bottom: 0; }
+.detail-grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr) 300px; align-items: start; }
+@media (max-width: 900px) { .detail-grid { grid-template-columns: minmax(0, 1fr); } }
+.stack { display: grid; gap: 12px; min-width: 0; }
+.desc { margin: 0; font-size: 14px; line-height: 1.6; }
+.kv { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; }
+.kv > span:first-child { color: var(--pencil); }
+.why { margin: 0; font-size: 12px; color: var(--pencil); }
+.thread { list-style: none; margin: 0; padding: 0; display: grid; }
+.comment { padding: 12px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px; }
+.c-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.c-head b { font-size: 13px; }
+.c-head time { font-size: 12px; color: var(--pencil); font-variant-numeric: tabular-nums; }
+.role { font-family: var(--head); font-size: 9.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--pencil); border: 1px solid var(--line); border-radius: 3px; padding: 0 5px; }
+.comment p { margin: 0; font-size: 13.5px; }
+.comment-form { display: grid; gap: 8px; padding-top: 4px; }
+.comment-form .btn { justify-self: end; }
+.seg { display: flex; gap: 6px; flex-wrap: wrap; }
+.seg label { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1.5px solid var(--field); border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; background: var(--card); }
+.seg label:has(input:checked) { border-color: var(--main); background: var(--tint); color: var(--main-t); }
+.seg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.overlay { position: absolute; inset: 0; background: rgba(26, 27, 46, .28); }
+.sheet { position: absolute; top: 0; right: 0; bottom: 0; width: min(460px, 92%); background: var(--card); border-left: 1.5px solid var(--ink); box-shadow: -3px 0 0 var(--ink); display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.sheet-head h4 { margin: 0; font-family: var(--head); font-size: 16px; font-weight: 600; }
+.sheet-body { padding: 18px 20px; display: grid; gap: 16px; align-content: start; overflow: auto; }
+.sheet-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--line); }
+.dlg-wrap { position: absolute; inset: 0; display: grid; place-items: center; padding: 20px; }
+.dialog { width: min(100%, 440px); background: var(--card); border: 1.5px solid var(--ink); border-radius: 4px; box-shadow: 4px 4px 0 var(--ink); }
+.dialog h4 { margin: 0; padding: 18px 20px 0; font-family: var(--head); font-size: 16px; font-weight: 600; line-height: 1.4; }
+.dialog p { margin: 0; padding: 12px 20px 0; font-size: 13.5px; }
+.dialog-foot { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; padding: 18px 20px 20px; }
+.placeholder { min-height: 200px; }
+.login { display: grid; place-items: center; padding: 40px 20px 40px 56px; min-height: 460px; }
+.login-box { width: min(100%, 380px); display: grid; gap: 12px; }
+.login-card { border: 1.5px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); padding: 24px; display: grid; gap: 14px; }
+.login-card .org { margin-top: -8px; }
+.login-note { margin: 0; font-size: 12px; color: var(--pencil); text-align: center; }
+.toast { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 10px 12px; background: var(--card); border: 1.5px solid var(--green); border-radius: 4px; box-shadow: 3px 3px 0 var(--ink); max-width: 400px; }
+.toast .stamp { color: var(--green); }
+.inline-err { padding: 10px 12px; border: 1.5px solid var(--red); border-radius: 4px; background: var(--card); display: grid; gap: 4px; }
+.inline-err b { color: var(--red); }
+.empty, .broken { padding: 22px 20px; display: grid; gap: 8px; justify-items: start; }
+.broken { border-color: var(--red); }
+.empty h5, .broken h5 { margin: 0; font-family: var(--head); font-size: 15px; font-weight: 600; }
+.empty p, .broken p { margin: 0; font-size: 13.5px; color: var(--pencil); max-width: 46ch; }
+.skel { padding: 12px; display: grid; gap: 10px; }
+.skel i { display: block; height: 12px; border-radius: 3px; background: var(--muted); }
+.skel .r { display: grid; grid-template-columns: 1fr 70px 70px 90px; gap: 14px; }
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } .btn.pri:active, .btn.danfill:active { transform: none; } .spin { animation: none; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <p class="eyebrow">HelpDeskPro · design system</p>
+    <h1 class="doc-h1">Registre</h1>
+    <p class="lede">Le registre du support, version moderne : un fond de cahier ligné avec sa marge rouge, les titres imprimés en police monospace, les statuts tamponnés comme sur papier, des angles nets et une seule ombre « encre » sur ce que l’on presse. Les règles en mots sont dans <a href="DESIGN-SYSTEM.md">DESIGN-SYSTEM.md</a>. Les écrans ci-dessous montrent les données du seed.</p>
+    <ul class="chips">
+      <li><b>Direction</b>Registre</li>
+      <li><b>Couleurs</b>Une couleur par sens</li>
+      <li><b>Texte</b>Mono pour les titres</li>
+      <li><b>Formes</b>Angles nets, ombre encre</li>
+      <li><b>Mise en page</b>Menu à gauche, panneau latéral</li>
+      <li><b>Icônes</b>Phosphor</li>
+      <li><b>Rédaction</b>Vous</li>
+    </ul>
+  </header>
+
+  <section class="section">
+    <h2 class="doc-h2">Couleurs</h2>
+    <p class="note">Thème clair. La couleur principale peint les grandes surfaces ; sa nuance foncée porte les liens et le petit texte.</p>
+    <div class="tokens">
+      <div class="token"><i style="background:#F4F5F8"></i><div><b>Papier</b><code>#F4F5F8</code><small>Fond de page, sous les lignes</small></div></div>
+      <div class="token"><i style="background:#FDFDFE"></i><div><b>Carte</b><code>#FDFDFE</code><small>Tableaux, formulaires, panneaux</small></div></div>
+      <div class="token"><i style="background:#1A1B2E"></i><div><b>Encre</b><code>#1A1B2E</code><small>Texte, bordures, ombre encre</small></div></div>
+      <div class="token"><i style="background:#5C5F73"></i><div><b>Crayon</b><code>#5C5F73</code><small>Texte secondaire, statuts au repos</small></div></div>
+      <div class="token"><i style="background:#E1E3EA"></i><div><b>Trait</b><code>#E1E3EA</code><small>Séparateurs, bordure des cartes</small></div></div>
+      <div class="token"><i style="background:#8F92A6"></i><div><b>Champ</b><code>#8F92A6</code><small>Bordure des champs au repos</small></div></div>
+      <div class="token"><i style="background:#6050DC"></i><div><b>Principale</b><code>#6050DC, survol #4F40C4</code><small>Bouton principal, menu actif, focus</small></div></div>
+      <div class="token"><i style="background:#EEEBFD"></i><div><b>Teinte principale</b><code>#EEEBFD</code><small>Menu actif, choix sélectionné, halo</small></div></div>
+      <div class="token"><i style="background:#3F35B5"></i><div><b>Texte principal</b><code>#3F35B5</code><small>Liens, tampon « En cours »</small></div></div>
+      <div class="token"><i style="background:rgba(96,80,220,.18)"></i><div><b>Lignes du cahier</b><code>principale à 9 %</code><small>Une ligne toutes les 24 px</small></div></div>
+      <div class="token"><i style="background:rgba(198,52,52,.6)"></i><div><b>Marge</b><code>#C63434 à 45 %</code><small>Le trait rouge, à 30 px du bord</small></div></div>
+      <div class="token"><i style="background:#13703F"></i><div><b>Vert</b><code>#13703F</code><small>Terminé</small></div></div>
+      <div class="token"><i style="background:#B42318"></i><div><b>Rouge</b><code>#B42318</code><small>À traiter maintenant, danger</small></div></div>
+    </div>
+    <h3 class="doc-h3">Une couleur = un sens</h3>
+    <div class="prod ruled board">
+      <div class="families">
+        <div class="family"><i class="sq" style="background:#5C5F73"></i><div class="name">Gris encre<span>Pas commencé, ou archivé</span></div><div class="set"><span class="stamp s-open">Ouvert</span><span class="stamp s-closed">Fermé</span><span class="missed">Dépassé</span></div></div>
+        <div class="family"><i class="sq" style="background:#3F35B5"></i><div class="name">Couleur principale<span>En route</span></div><div class="set"><span class="stamp s-prog">En cours</span></div></div>
+        <div class="family"><i class="sq" style="background:#13703F"></i><div class="name">Vert<span>Terminé</span></div><div class="set"><span class="stamp s-done">Résolu</span><span class="met">Respecté</span></div></div>
+        <div class="family"><i class="sq" style="background:#B42318"></i><div class="name">Rouge<span>À traiter maintenant</span></div><div class="set"><span class="stamp s-late">En retard</span></div></div>
+      </div>
+      <p class="note">Un SLA dépassé est gris : le ticket est terminé, plus rien à faire. La priorité n’a pas de couleur, donc un ticket en retard reste le seul élément rouge d’une liste.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="doc-h2">Typographie</h2>
+    <p class="note">Martian Mono pour les titres et les en-têtes ; Public Sans pour tout le reste, chiffres compris.</p>
+    <div class="scale">
+      <div class="scale-row"><span class="role">Titre de page</span><span class="sample" style="font-family:var(--head);font-weight:600;font-size:22px;letter-spacing:-.015em">Tickets</span><span class="spec">Martian Mono, 22 px, 600</span></div>
+      <div class="scale-row"><span class="role">Panneau, dialogue</span><span class="sample" style="font-family:var(--head);font-weight:600;font-size:16px">Nouveau ticket</span><span class="spec">Martian Mono, 16 px, 600</span></div>
+      <div class="scale-row"><span class="role">En-tête de tableau</span><span class="sample" style="font-family:var(--head);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em">Échéance SLA</span><span class="spec">Martian Mono, 10,5 px, capitales</span></div>
+      <div class="scale-row"><span class="role">Texte</span><span class="sample" style="font-size:14px">Le client confirme que tous ses utilisateurs sont touchés.</span><span class="spec">Public Sans, 14 px, 400</span></div>
+      <div class="scale-row"><span class="role">Texte de tableau</span><span class="sample" style="font-size:13px">Imprimante réseau hors ligne chez le client</span><span class="spec">Public Sans, 13 px, 400</span></div>
+      <div class="scale-row"><span class="role">Libellé, bouton</span><span class="sample" style="font-size:13px;font-weight:600">Marquer résolu</span><span class="spec">Public Sans, 13 px, 600</span></div>
+      <div class="scale-row"><span class="role">Petit texte, date</span><span class="sample" style="font-size:12px;color:var(--pencil)">13/10/2026 16:30</span><span class="spec">Public Sans, 12 px, 400</span></div>
+      <div class="scale-row"><span class="role">Tampon</span><span class="sample"><span class="stamp s-prog">En cours</span></span><span class="spec">Public Sans, 10 px, 700, capitales</span></div>
+      <div class="scale-row"><span class="role">Grand nombre</span><span class="sample" style="font-size:24px;font-weight:700;font-variant-numeric:tabular-nums">10</span><span class="spec">Public Sans, 24 px, 700</span></div>
+    </div>
+    <div class="rulecards">
+      <div class="rulecard"><b>Ponctuation</b><span class="ex">Supprimer le ticket</span><small>Une espace fine insécable avant ! : ; et à l’intérieur des « ».</small></div>
+      <div class="rulecard"><b>Dates et heures</b><span class="ex">le 13/10/2026 à 16:30</span><small>Jour d’abord, sur deux chiffres, dans le fuseau du navigateur.</small></div>
+      <div class="rulecard"><b>Chiffres</b><span class="ex">3 tickets</span><small>Chiffres à chasse fixe dans les tableaux et les indicateurs.</small></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="doc-h2">Formes et espacements</h2>
+    <div class="rulecards">
+      <div class="rulecard"><b>Densité</b><small>Champs de 36 px, lignes de tableau d’environ 37 px.</small></div>
+      <div class="rulecard"><b>Angles</b><small>4 px sur les cartes, boutons et champs ; 3 px sur les tampons. Rien d’arrondi ni en pilule.</small></div>
+      <div class="rulecard"><b>Traits</b><small>1 px pour les lignes et les cartes ; 1,5 px pour les boutons, champs et tampons ; double trait sous les en-têtes de tableau.</small></div>
+      <div class="rulecard"><b>Profondeur</b><small>Aucune ombre floue. Ombre encre de 2 px sur le bouton principal, de 3 à 4 px sur le panneau, les dialogues, les notifications et la carte de connexion.</small></div>
+      <div class="rulecard"><b>Focus</b><small>Contour de 2 px dans la couleur principale, plus un halo teinté autour des champs, sur tout ce que le clavier atteint.</small></div>
+      <div class="rulecard"><b>Espacements</b><div class="scale-bar"><span><i style="height:4px"></i>4</span><span><i style="height:8px"></i>8</span><span><i style="height:12px"></i>12</span><span><i style="height:16px"></i>16</span><span><i style="height:24px"></i>24</span><span><i style="height:32px"></i>32</span></div><small>Chaque marge et chaque écart utilise une de ces valeurs, en pixels.</small></div>
+      <div class="rulecard"><b>Lignes du cahier</b><small>Seulement sur le fond de page. Cartes, tableaux et formulaires sont posés dessus, en blanc.</small></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="doc-h2">Écrans de référence</h2>
+    <p class="note">Menu à gauche ; chaque page commence par son contexte, son titre et une seule action principale à droite. Vus par l’admin, avec les données du seed.</p>
+
+    <article class="screen prod">
+      <div class="screen-cap"><b>Connexion</b><span>Le premier écran</span></div>
+      <div class="ruled login">
+        <div class="login-box">
+          <form class="card login-card">
+            <span class="logo">HelpDeskPro</span>
+            <span class="org">Support client</span>
+            <h3 class="h-title">Connexion</h3>
+            <div class="field"><label for="l-mail">E-mail</label><input id="l-mail" class="input focus" type="email" value="admin@helpdeskpro.ma"></div>
+            <div class="field"><label for="l-pass">Mot de passe</label><input id="l-pass" class="input" type="password" value="exemple-mdp"></div>
+            <button class="btn pri wide" type="button">Se connecter</button>
+          </form>
+          <p class="login-note">Votre session reste ouverte 8 heures.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="screen prod">
+      <div class="screen-cap"><b>Tableau de bord</b><span>Indicateurs, top 5 des agents, tickets récents</span></div>
+      <div class="frame">
+        <aside class="side">
+          <div class="brand"><span class="logo">HelpDeskPro</span><span class="org">Support client</span></div>
+          <nav class="nav" aria-label="Menu"><a href="#" class="on" aria-current="page">Tableau de bord</a><a href="#">Tickets</a></nav>
+          <div class="me"><b>Nadia Benali</b><span>Admin</span><a href="#">Se déconnecter</a></div>
+        </aside>
+        <div class="ruled main">
+          <div class="head">
+            <div><p class="crumb">Mardi 13 octobre 2026</p><h3 class="h-title">Tableau de bord</h3></div>
+            <button class="btn pri" type="button"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>Nouveau ticket</button>
+          </div>
+          <div class="tiles">
+            <div class="card tile"><span class="t-l">Tickets au total</span><b class="t-n">10</b><span class="t-s">Tous statuts confondus</span></div>
+            <div class="card tile"><span class="t-l">Ouverts</span><b class="t-n">3</b><span class="t-s"><a href="#">Voir les tickets ouverts</a></span></div>
+            <div class="card tile"><span class="t-l">En cours</span><b class="t-n">2</b><span class="t-s"><a href="#">Voir les tickets en cours</a></span></div>
+            <div class="card tile late"><span class="t-l">En retard</span><b class="t-n">2</b><span class="t-s">Échéance SLA dépassée, pas encore résolus</span></div>
+          </div>
+          <div class="cols">
+            <section class="card panel">
+              <h4 class="cap">Top 5 des agents</h4>
+              <p class="hint">Tickets résolus ou fermés, par agent assigné.</p>
+              <ol class="list">
+                <li class="rank"><span class="n">01</span><span>Youssef Amrani</span><span class="c">3 tickets</span></li>
+                <li class="rank"><span class="n">02</span><span>Sara El Idrissi</span><span class="c">2 tickets</span></li>
+              </ol>
+            </section>
+            <section class="card panel">
+              <h4 class="cap">Tickets récents</h4>
+              <p class="hint">Les 5 derniers tickets créés.</p>
+              <ul class="list">
+                <li class="rec"><a class="tl" href="#">Erreur 504 sur la page de paiement</a><span class="set"><span class="stamp s-open">Ouvert</span></span></li>
+                <li class="rec"><a class="tl" href="#">Imprimante réseau hors ligne chez le client</a><span class="set"><span class="stamp s-prog">En cours</span></span></li>
+                <li class="rec"><a class="tl" href="#">Impossible de se connecter au portail client</a><span class="set"><span class="stamp s-prog">En cours</span><span class="stamp s-late">En retard</span></span></li>
+                <li class="rec"><a class="tl" href="#">Changement d’adresse de livraison</a><span class="set"><span class="stamp s-open">Ouvert</span></span></li>
+                <li class="rec"><a class="tl" href="#">Factures de septembre introuvables dans l’espace client</a><span class="set"><span class="stamp s-open">Ouvert</span><span class="stamp s-late">En retard</span></span></li>
+              </ul>
+            </section>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="screen prod">
+      <div class="screen-cap"><b>Tickets</b><span>La liste : filtres, recherche, pagination</span></div>
+      <div class="frame">
+        <aside class="side">
+          <div class="brand"><span class="logo">HelpDeskPro</span><span class="org">Support client</span></div>
+          <nav class="nav" aria-label="Menu"><a href="#">Tableau de bord</a><a href="#" class="on" aria-current="page">Tickets</a></nav>
+          <div class="me"><b>Nadia Benali</b><span>Admin</span><a href="#">Se déconnecter</a></div>
+        </aside>
+        <div class="ruled main">
+          <div class="head">
+            <div><p class="crumb">Support</p><h3 class="h-title">Tickets</h3></div>
+            <button class="btn pri" type="button"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></svg>Nouveau ticket</button>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Statut">
+            <button class="tab on" type="button" role="tab" aria-selected="true">Tous</button>
+            <button class="tab" type="button" role="tab" aria-selected="false">Ouverts</button>
+            <button class="tab" type="button" role="tab" aria-selected="false">En cours</button>
+            <button class="tab" type="button" role="tab" aria-selected="false">Résolus</button>
+            <button class="tab" type="button" role="tab" aria-selected="false">Fermés</button>
+          </div>
+          <div class="tools">
+            <div class="search">
+              <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></svg>
+              <label class="sr" for="q">Rechercher</label>
+              <input id="q" class="input" type="search" placeholder="Rechercher dans le titre ou la description">
+            </div>
+            <select class="select" aria-label="Priorité"><option>Toutes les priorités</option><option>Haute</option><option>Moyenne</option><option>Basse</option></select>
+            <select class="select" aria-label="Agent assigné"><option>Tous les agents</option><option>Youssef Amrani</option><option>Sara El Idrissi</option></select>
+          </div>
+          <div class="card tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>Ticket</th><th>Statut</th><th>Priorité</th><th>Assigné à</th><th>Échéance SLA</th><th>Créé le</th></tr></thead>
+              <tbody>
+                <tr><td class="t"><a class="tl" href="#">Erreur 504 sur la page de paiement</a></td><td><span class="stamp s-open">Ouvert</span></td><td><span class="prio"><span class="bars" aria-hidden="true"><i class="f"></i><i class="f"></i><i class="f"></i></span>Haute</span></td><td class="muted">Non assigné</td><td>14/10/2026 00:30</td><td>13/10/2026</td></tr>
+                <tr><td class="t"><a class="tl" href="#">Imprimante réseau hors ligne chez le client</a></td><td><span class="stamp s-prog">En cours</span></td><td><span class="prio"><span class="bars" aria-hidden="true"><i class="f"></i><i class="f"></i><i></i></span>Moyenne</span></td><td>Sara El Idrissi</td><td>14/10/2026 17:30</td><td>13/10/2026</td></tr>
+                <tr><td class="t"><a class="tl" href="#">Impossible de se connecter au portail client</a></td><td><span class="stamp s-prog">En cours</span></td><td><span class="prio"><span class="bars" aria-hidden="true"><i class="f"></i><i class="f"></i><i class="f"></i></span>Haute</span></td><td>Youssef Amrani</td><td><span class="due">13/10/2026 20:30<span class="stamp s-late">En retard</span></span></td><td>13/10/2026</td></tr>
+                <tr><td class="t"><a class="tl" href="#">Changement d’adresse de livraison</a></td><td><span class="stamp s-open">Ouvert</span></td><td><span class="prio"><span class="bars" aria-hidden="true"><i class="f"></i><i></i><i></i></span>Basse</span></td><td>Youssef Amrani</td><td>16/10/2026 12:30</td><td>13/10/2026</td></tr>
+                <tr><td class="t"><a class="tl" href="#">Factures de septembre introuvables dans l’espace client</a></td><td><span class="stamp s-open">Ouvert</span></td><td><span class="prio"><span class="bars" aria-hidden="true"><i class="f"></i><i class="f"></i><i></i></span>Moyenne</span></td><td class="muted">Non assigné</td><td><span class="due">13/10/2026 16:30<span class="stamp s-late">En retard</span></span></td><td>12/10/2026</td></tr>
+                <tr><td class="t"><a class="tl" href="#">L’application mobile se ferme au démarrage</a></td><td><span class="stamp s-done">Résolu</span></td><td><span class="prio"><span class="bars" aria-hidden="true"><i class="f"></i><i class="f"></i><i class="f"></i></span>Haute</span></td><td>Youssef Amrani</td><td><span class="met">Respecté</span></td><td>11/10/2026</td></tr>
+                <tr><td class="t"><a class="tl" href="#">Export CSV des commandes vide</a></td><td><span class="stamp s-done">Résolu</span></td><td><span class="prio"><span class="bars" aria-hidden="true"><i class="f"></i><i class="f"></i><i></i></span>Moyenne</span></td><td>Sara El Idrissi</td><td><span class="missed">Dépassé</span></td><td>10/10/2026</td></tr>
+                <tr><td class="t"><a class="tl" href="#">Site vitrine inaccessible</a></td><td><span class="stamp s-closed">Fermé</span></td><td><span class="prio"><span class="bars" aria-hidden="true"><i class="f"></i><i class="f"></i><i class="f"></i></span>Haute</span></td><td>Sara El Idrissi</td><td><span class="missed">Dépassé</span></td><td>09/10/2026</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pager">
+            <span>1 à 8 sur 10 tickets</span>
+            <div class="pages"><button class="pg on" type="button" aria-current="page">1</button><button class="pg" type="button">2</button><button class="pg" type="button">Suivant</button></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="screen prod">
+      <div class="screen-cap"><b>Un ticket</b><span>Contenu à gauche ; statut, assignation et SLA à droite</span></div>
+      <div class="frame">
+        <aside class="side">
+          <div class="brand"><span class="logo">HelpDeskPro</span><span class="org">Support client</span></div>
+          <nav class="nav" aria-label="Menu"><a href="#">Tableau de bord</a><a href="#" class="on" aria-current="page">Tickets</a></nav>
+          <div class="me"><b>Nadia Benali</b><span>Admin</span><a href="#">Se déconnecter</a></div>
+        </aside>
+        <div class="ruled main">
+          <div class="head">
+            <div>
+              <p class="crumb"><a href="#">Tickets</a></p>
+              <div class="trow"><h3 class="h-title">Factures de septembre introuvables dans l’espace client</h3><span class="stamp s-open">Ouvert</span><span class="stamp s-late">En retard</span></div>
+              <p class="sub">Créé par Sara El Idrissi le 12/10/2026 à 16:30</p>
+            </div>
+            <div class="btns"><button class="btn" type="button">Modifier</button><button class="btn dan" type="button">Supprimer le ticket</button></div>
+          </div>
+          <div class="detail-grid">
+            <div class="stack">
+              <section class="card panel">
+                <h4 class="cap">Description</h4>
+                <p class="desc">Le client Riad Immobilier ne voit plus ses factures de septembre dans l’onglet Facturation. Les factures d’août s’affichent correctement.</p>
+              </section>
+              <section class="card panel">
+                <h4 class="cap">Commentaires (2)</h4>
+                <ol class="thread">
+                  <li class="comment"><div class="c-head"><b>Sara El Idrissi</b><span class="role">Agent</span><time>12/10/2026 17:30</time></div><p>Le client a envoyé une capture d’écran de l’onglet Facturation vide.</p></li>
+                  <li class="comment"><div class="c-head"><b>Nadia Benali</b><span class="role">Admin</span><time>13/10/2026 02:30</time></div><p>À répartir en priorité demain matin.</p></li>
+                </ol>
+                <form class="comment-form">
+                  <div class="field"><label for="msg">Nouveau commentaire</label><textarea id="msg" class="area" placeholder="Écrivez votre message"></textarea></div>
+                  <button class="btn" type="button">Ajouter le commentaire</button>
+                </form>
+              </section>
+            </div>
+            <div class="stack">
+              <section class="card panel">
+                <h4 class="cap">Statut</h4>
+                <div class="kv"><span>Actuel</span><span class="stamp s-open">Ouvert</span></div>
+                <button class="btn wide" type="button" disabled>Passer en cours</button>
+                <button class="btn wide" type="button" disabled>Marquer résolu</button>
+                <p class="why">Assignez un agent pour changer le statut.</p>
+              </section>
+              <section class="card panel">
+                <h4 class="cap">Assignation</h4>
+                <div class="field"><label for="agent">Agent</label><select id="agent" class="select"><option>Choisir un agent</option><option>Youssef Amrani</option><option>Sara El Idrissi</option></select></div>
+                <button class="btn pri wide" type="button">Assigner</button>
+              </section>
+              <section class="card panel">
+                <h4 class="cap">Suivi SLA</h4>
+                <div class="kv"><span>Priorité</span><span class="prio"><span class="bars" aria-hidden="true"><i class="f"></i><i class="f"></i><i></i></span>Moyenne</span></div>
+                <div class="kv"><span>Délai</span><b>24 h</b></div>
+                <div class="kv"><span>Échéance</span><b>13/10/2026 16:30</b></div>
+                <div class="kv"><span>État</span><span class="stamp s-late">En retard</span></div>
+                <div class="kv"><span>Modifié le</span><span>12/10/2026 16:30</span></div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="screen prod">
+      <div class="screen-cap"><b>Nouveau ticket</b><span>Création et modification dans un panneau latéral</span></div>
+      <div class="frame" style="min-height:600px">
+        <aside class="side">
+          <div class="brand"><span class="logo">HelpDeskPro</span><span class="org">Support client</span></div>
+          <nav class="nav" aria-label="Menu"><a href="#">Tableau de bord</a><a href="#" class="on" aria-current="page">Tickets</a></nav>
+          <div class="me"><b>Nadia Benali</b><span>Admin</span><a href="#">Se déconnecter</a></div>
+        </aside>
+        <div class="ruled main">
+          <div class="head">
+            <div><p class="crumb">Support</p><h3 class="h-title">Tickets</h3></div>
+            <span class="btn pri">Nouveau ticket</span>
+          </div>
+          <div class="card placeholder"></div>
+          <div class="overlay" aria-hidden="true"></div>
+          <aside class="sheet" aria-label="Nouveau ticket">
+            <div class="sheet-head">
+              <h4>Nouveau ticket</h4>
+              <button class="btn icon" type="button" aria-label="Fermer le panneau"><svg viewBox="0 0 256 256" fill="currentColor" aria-hidden="true"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
+            </div>
+            <form class="sheet-body">
+              <div class="field"><label for="f-title">Titre</label><input id="f-title" class="input focus" value="Paiement par carte refusé sur l’application"></div>
+              <div class="field"><label for="f-desc">Description</label><textarea id="f-desc" class="area" placeholder="Ce que le client signale, depuis quand, qui est touché"></textarea><small>Ce que le client signale, depuis quand, qui est touché.</small></div>
+              <fieldset class="field">
+                <legend>Priorité</legend>
+                <div class="seg">
+                  <label for="p-low"><input id="p-low" type="radio" name="prio"><span class="bars" aria-hidden="true"><i class="f"></i><i></i><i></i></span>Basse</label>
+                  <label for="p-med"><input id="p-med" type="radio" name="prio" checked><span class="bars" aria-hidden="true"><i class="f"></i><i class="f"></i><i></i></span>Moyenne</label>
+                  <label for="p-high"><input id="p-high" type="radio" name="prio"><span class="bars" aria-hidden="true"><i class="f"></i><i class="f"></i><i class="f"></i></span>Haute</label>
+                </div>
+                <small>À résoudre en 24 h. Haute : 4 h, basse : 72 h.</small>
+              </fieldset>
+            </form>
+            <div class="sheet-foot"><button class="btn" type="button">Annuler</button><button class="btn pri" type="button">Créer le ticket</button></div>
+          </aside>
+        </div>
+      </div>
+    </article>
+
+    <article class="screen prod">
+      <div class="screen-cap"><b>Confirmation</b><span>Supprimer un ticket ouvert, réservé à l’admin</span></div>
+      <div class="frame" style="min-height:420px">
+        <aside class="side">
+          <div class="brand"><span class="logo">HelpDeskPro</span><span class="org">Support client</span></div>
+          <nav class="nav" aria-label="Menu"><a href="#">Tableau de bord</a><a href="#" class="on" aria-current="page">Tickets</a></nav>
+          <div class="me"><b>Nadia Benali</b><span>Admin</span><a href="#">Se déconnecter</a></div>
+        </aside>
+        <div class="ruled main">
+          <div class="head">
+            <div>
+              <p class="crumb"><a href="#">Tickets</a></p>
+              <div class="trow"><h3 class="h-title">Factures de septembre introuvables dans l’espace client</h3><span class="stamp s-open">Ouvert</span></div>
+            </div>
+            <div class="btns"><span class="btn">Modifier</span><span class="btn dan">Supprimer le ticket</span></div>
+          </div>
+          <div class="card placeholder"></div>
+          <div class="overlay" aria-hidden="true"></div>
+          <div class="dlg-wrap">
+            <div class="dialog" role="alertdialog" aria-labelledby="d-title" aria-describedby="d-text">
+              <h4 id="d-title">Supprimer le ticket « Factures de septembre introuvables dans l’espace client »</h4>
+              <p id="d-text">Ses 2 commentaires seront supprimés avec lui. Cette action est définitive.</p>
+              <div class="dialog-foot"><button class="btn" type="button">Garder le ticket</button><button class="btn danfill" type="button">Oui, supprimer le ticket</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="section">
+    <h2 class="doc-h2">Composants</h2>
+    <p class="note">Icônes Phosphor, graisse regular. Tous les composants reprennent les jetons ci-dessus.</p>
+    <div class="prod ruled board">
+      <div>
+        <p class="board-cap">Boutons</p>
+        <div class="row">
+          <div class="btn-desc"><button class="btn pri" type="button">Créer le ticket</button><small>Principal : la seule action principale de l’écran.</small></div>
+          <div class="btn-desc"><button class="btn" type="button">Modifier</button><small>Secondaire : toutes les autres actions.</small></div>
+          <div class="btn-desc"><button class="btn dan" type="button">Supprimer le ticket</button><small>Danger : ouvre d’abord une confirmation.</small></div>
+          <div class="btn-desc"><button class="btn danfill" type="button">Oui, supprimer le ticket</button><small>Le clic final, dans le dialogue.</small></div>
+          <div class="btn-desc"><button class="btn" type="button" disabled>Passer en cours</button><small>Désactivé : dit pourquoi juste en dessous.</small></div>
+          <div class="btn-desc"><button class="btn pri" type="button"><span class="spin" aria-hidden="true"></span>Création en cours</button><small>En cours : dit ce qu’il fait.</small></div>
+        </div>
+      </div>
+      <div>
+        <p class="board-cap">Tampons, SLA et priorité</p>
+        <div class="row">
+          <span class="stamp s-open">Ouvert</span><span class="stamp s-prog">En cours</span><span class="stamp s-done">Résolu</span><span class="stamp s-closed">Fermé</span><span class="stamp s-late">En retard</span>
+          <span class="met">Respecté</span><span class="missed">Dépassé</span>
+          <span class="prio"><span class="bars" aria-hidden="true"><i class="f"></i><i></i><i></i></span>Basse</span>
+          <span class="prio"><span class="bars" aria-hidden="true"><i class="f"></i><i class="f"></i><i></i></span>Moyenne</span>
+          <span class="prio"><span class="bars" aria-hidden="true"><i class="f"></i><i class="f"></i><i class="f"></i></span>Haute</span>
+        </div>
+      </div>
+      <div>
+        <p class="board-cap">Champs</p>
+        <div class="grid-2">
+          <div class="field"><label for="c1">Titre</label><input id="c1" class="input" value="Site vitrine inaccessible"></div>
+          <div class="field"><label for="c2">Recherche</label><input id="c2" class="input focus" value="504"></div>
+          <div class="field"><label for="c3">Titre</label><input id="c3" class="input invalid" value="" aria-invalid="true" aria-describedby="c3-e"><p id="c3-e" class="field-error">Indiquez un titre.</p></div>
+          <div class="field"><label for="c4">Statut</label><input id="c4" class="input" value="Fermé, plus aucune modification" disabled></div>
+        </div>
+      </div>
+      <div>
+        <p class="board-cap">Messages</p>
+        <div class="grid-2">
+          <div class="toast" role="status"><span class="stamp">Fait</span>Ticket créé.</div>
+          <div class="inline-err" role="alert"><b>Impossible de commenter un ticket fermé.</b><span>Le message de l’API s’affiche tel quel, à côté du bouton.</span></div>
+        </div>
+      </div>
+      <div>
+        <p class="board-cap">Vide, chargement, échec</p>
+        <div class="grid-2">
+          <div class="card empty"><h5>Aucun ticket ne correspond</h5><p>Changez les filtres ou la recherche.</p><button class="btn" type="button">Effacer les filtres</button></div>
+          <div class="card skel" aria-label="Chargement"><div class="r"><i></i><i></i><i></i><i></i></div><div class="r"><i></i><i></i><i></i><i></i></div><div class="r"><i></i><i></i><i></i><i></i></div><div class="r"><i></i><i></i><i></i><i></i></div></div>
+          <div class="card broken"><h5>Cette page n’a pas pu s’afficher</h5><p>Rien n’a été perdu. Réessayez dans un instant.</p><button class="btn" type="button">Réessayer</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="doc-h2">Rédaction</h2>
+    <ul class="rules">
+      <li>L’application vouvoie. Phrases courtes, jamais « Veuillez ». Un bouton dit un verbe et ce sur quoi il agit : « Créer le ticket ».</li>
+      <li>Ni anglais ni termes techniques (API, serveur, jeton, codes d’erreur).</li>
+      <li>Un succès dit ce qui s’est passé ; une erreur dit ce qui ne va pas, puis quoi faire ; une confirmation pose une question, annonce la conséquence et propose deux boutons explicites.</li>
+    </ul>
+    <h3 class="doc-h3">Un mot par action</h3>
+    <div class="scroll">
+      <table class="lex">
+        <thead><tr><th>Mot</th><th>Usage</th><th>Jamais</th></tr></thead>
+        <tbody>
+          <tr><td>Créer le ticket</td><td>Valider le panneau de création</td><td class="never">Soumettre, Ajouter</td></tr>
+          <tr><td>Enregistrer</td><td>Valider la modification d’un ticket</td><td class="never">Sauvegarder, Mettre à jour</td></tr>
+          <tr><td>Assigner</td><td>Confier le ticket à un agent (admin)</td><td class="never">Attribuer, Affecter</td></tr>
+          <tr><td>Retirer l’agent</td><td>Désassigner ; un ticket en cours repasse « Ouvert »</td><td class="never">Désassigner</td></tr>
+          <tr><td>Passer en cours</td><td>Ouvert → En cours</td><td class="never">Démarrer, Prendre</td></tr>
+          <tr><td>Marquer résolu</td><td>Ouvert ou En cours → Résolu</td><td class="never">Terminer, Clôturer</td></tr>
+          <tr><td>Rouvrir</td><td>Résolu → En cours</td><td class="never">Réactiver</td></tr>
+          <tr><td>Fermer le ticket</td><td>Résolu → Fermé, définitif</td><td class="never">Archiver, Clôturer</td></tr>
+          <tr><td>Annuler</td><td>Fermer un panneau ou un dialogue sans rien changer</td><td class="never">Fermer (réservé au ticket)</td></tr>
+          <tr><td>Supprimer le ticket</td><td>Admin, ticket ouvert uniquement, après confirmation</td><td class="never">Effacer</td></tr>
+          <tr><td>Ajouter le commentaire</td><td>Publier un commentaire</td><td class="never">Envoyer, Poster</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+</body>
+</html>

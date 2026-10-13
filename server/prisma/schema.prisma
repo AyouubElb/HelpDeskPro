@@ -1,0 +1,98 @@
+// The pg_trgm extension and the CHECK constraints are added by hand in the migration SQL.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  admin
+  agent
+}
+
+enum TicketStatus {
+  open
+  in_progress
+  resolved
+  closed
+}
+
+enum TicketPriority {
+  low
+  medium
+  high
+}
+
+model User {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         Role
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  createdTickets  Ticket[]        @relation("TicketCreatedBy")
+  assignedTickets Ticket[]        @relation("TicketAssignedTo")
+  comments        TicketComment[]
+
+  @@map("users")
+}
+
+model SlaPolicy {
+  priority        TicketPriority @id
+  resolutionHours Int            @map("resolution_hours")
+  tickets         Ticket[]
+
+  @@map("sla_policies")
+}
+
+model Ticket {
+  id           String         @id @default(uuid(7)) @db.Uuid
+  title        String
+  description  String
+  priority     TicketPriority @default(medium)
+  status       TicketStatus   @default(open)
+  createdById  String         @map("created_by") @db.Uuid
+  assignedToId String?        @map("assigned_to") @db.Uuid
+  dueAt        DateTime       @map("due_at") @db.Timestamptz(3)
+  resolvedAt   DateTime?      @map("resolved_at") @db.Timestamptz(3)
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime       @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  createdBy  User            @relation("TicketCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  assignedTo User?           @relation("TicketAssignedTo", fields: [assignedToId], references: [id], onDelete: Restrict)
+  slaPolicy  SlaPolicy       @relation(fields: [priority], references: [priority], onDelete: Restrict)
+  comments   TicketComment[]
+
+  @@index([status])
+  @@index([priority])
+  @@index([assignedToId])
+  @@index([createdAt])
+  @@index([createdById])
+  @@index([dueAt])
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin, map: "tickets_title_trgm_idx")
+  @@index([description(ops: raw("gin_trgm_ops"))], type: Gin, map: "tickets_description_trgm_idx")
+  @@map("tickets")
+}
+
+model TicketComment {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  ticketId  String   @map("ticket_id") @db.Uuid
+  authorId  String   @map("author_id") @db.Uuid
+  message   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author User   @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([ticketId, createdAt])
+  @@index([authorId])
+  @@map("ticket_comments")
+}

@@ -35,48 +35,53 @@ HelpDeskPro est un outil interne : le personnel support enregistre les demandes 
 
 ```mermaid
 erDiagram
-    USERS ||--o{ TICKETS : "crée (created_by)"
-    USERS |o--o{ TICKETS : "est assigné (assigned_to)"
-    SLA_POLICIES ||--o{ TICKETS : "fixe le délai (priority)"
-    TICKETS ||--o{ TICKET_COMMENTS : "contient (ticket_id)"
-    USERS ||--o{ TICKET_COMMENTS : "écrit (author_id)"
+    USERS ||--o{ TICKETS : "crée (1 → 0..N)"
+    USERS |o--o{ TICKETS : "est assigné (0..1 → 0..N)"
+    SLA_POLICIES ||--o{ TICKETS : "fixe le délai (1 → 0..N)"
+    TICKETS ||--o{ TICKET_COMMENTS : "contient (1 → 0..N)"
+    USERS ||--o{ TICKET_COMMENTS : "écrit (1 → 0..N)"
 
     USERS {
         uuid id PK
-        text name
-        text email UK "toujours en minuscules"
-        text password_hash "hash bcrypt"
+        text email UK
         Role role "admin ou agent"
-        timestamptz created_at
-        timestamptz updated_at
     }
     SLA_POLICIES {
-        TicketPriority priority PK "low, medium, high"
-        int resolution_hours "délai en heures, supérieur à 0"
+        TicketPriority priority PK
+        int resolution_hours
     }
     TICKETS {
         uuid id PK
-        text title
-        text description
+        uuid created_by FK "créateur"
+        uuid assigned_to FK "agent, nullable"
         TicketPriority priority FK
-        TicketStatus status "open, in_progress, resolved, closed"
-        uuid created_by FK
-        uuid assigned_to FK "nullable"
+        TicketStatus status
         timestamptz due_at "échéance SLA"
-        timestamptz resolved_at "nullable"
-        timestamptz created_at
-        timestamptz updated_at
     }
     TICKET_COMMENTS {
         uuid id PK
         uuid ticket_id FK
         uuid author_id FK
-        text message
-        timestamptz created_at
     }
 ```
 
+Le schéma ne montre que les clés et les colonnes principales ; toutes les colonnes sont détaillées au §4. Lecture des symboles : `||` exactement un, `|o` zéro ou un, `o{` zéro ou plusieurs.
+
 Les trois tables demandées par le sujet (`users`, `tickets`, `ticket_comments`) sont complétées par `sla_policies`, qui porte les délais SLA par priorité.
+
+### Relations
+
+| Relation | Cardinalité | Clé étrangère |
+|---|---|---|
+| Un utilisateur **crée** des tickets | 1 → 0..N : un ticket a exactement un créateur | `tickets.created_by` (obligatoire) |
+| Un agent **est assigné** à des tickets | 0..1 → 0..N : un ticket a zéro ou un agent | `tickets.assigned_to` (facultative) |
+| Une priorité SLA **s'applique** à des tickets | 1 → 0..N : un ticket a exactement une priorité | `tickets.priority` |
+| Un ticket **contient** des commentaires | 1 → 0..N : un commentaire appartient à un seul ticket | `ticket_comments.ticket_id` |
+| Un utilisateur **écrit** des commentaires | 1 → 0..N : un commentaire a un seul auteur | `ticket_comments.author_id` |
+
+- Toutes les relations sont de type **un-à-plusieurs (1-N)** ; il n'y a aucune relation un-à-un (1-1).
+- `users` et `tickets` sont reliés **deux fois**, par deux relations distinctes : le créateur et l'agent assigné.
+- « Un utilisateur commente plusieurs tickets, un ticket reçoit les commentaires de plusieurs utilisateurs » est une relation **plusieurs-à-plusieurs (N-N)** : elle passe par `ticket_comments`, une table à part entière (une ligne par message, avec son texte et sa date).
 
 ### Colonnes ajoutées au minimum du sujet
 
@@ -188,37 +193,7 @@ Les valeurs de `status`, `priority` et `role` sont contraintes par des **enums P
 
 ### 5.3 Où vit chaque contrainte
 
-Prisma génère la migration à partir de `schema.prisma`, mais ne sait exprimer ni les CHECK ni la création de l'extension `pg_trgm`. Ces éléments sont ajoutés à la main dans le SQL de la migration (`prisma migrate dev --create-only`, édition du fichier, puis application).
-
-| Élément | Où |
-|---|---|
-| Tables, enums, PK, FK et leur ON DELETE, UNIQUE, NOT NULL, valeurs par défaut, tous les index (y compris trigram) | `schema.prisma`, puis migration générée |
-| Extension `pg_trgm`, contraintes CHECK | Ajoutées à la main dans `migration.sql` |
-
-SQL ajouté à la main :
-
-```sql
--- En tête de migration, avant les index trigram
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
-
--- En fin de migration
-ALTER TABLE "users"
-  ADD CONSTRAINT "users_email_lowercase_chk" CHECK (email = lower(email));
-
-ALTER TABLE "sla_policies"
-  ADD CONSTRAINT "sla_policies_resolution_hours_chk" CHECK (resolution_hours > 0);
-
-ALTER TABLE "tickets"
-  ADD CONSTRAINT "tickets_title_not_blank_chk"        CHECK (btrim(title) <> ''),
-  ADD CONSTRAINT "tickets_description_not_blank_chk"  CHECK (btrim(description) <> ''),
-  ADD CONSTRAINT "tickets_resolved_at_status_chk"     CHECK ((status IN ('resolved', 'closed')) = (resolved_at IS NOT NULL)),
-  ADD CONSTRAINT "tickets_assignee_required_chk"      CHECK (status = 'open' OR assigned_to IS NOT NULL),
-  ADD CONSTRAINT "tickets_due_after_created_chk"      CHECK (due_at > created_at),
-  ADD CONSTRAINT "tickets_resolved_after_created_chk" CHECK (resolved_at IS NULL OR resolved_at >= created_at);
-
-ALTER TABLE "ticket_comments"
-  ADD CONSTRAINT "ticket_comments_message_not_blank_chk" CHECK (btrim(message) <> '');
-```
+Prisma génère la migration à partir de `schema.prisma` (tables, enums, clés, `UNIQUE`, `NOT NULL`, valeurs par défaut, index), mais ne sait exprimer ni les contraintes `CHECK` ni l'extension `pg_trgm` : elles sont ajoutées à la main dans [la migration SQL](../server/prisma/migrations/20261013214935_init/migration.sql).
 
 ## 6. Index
 
@@ -240,9 +215,7 @@ PostgreSQL n'indexe pas automatiquement les clés étrangères : chaque clé ét
 
 ### Recherche : pourquoi un index trigram
 
-La recherche porte sur des fragments (« imprim », « 504 ») dans le titre **ou** la description. Un `ILIKE '%…%'` ne peut pas utiliser un index B-tree et parcourt toute la table. L'extension `pg_trgm` découpe chaque texte en groupes de 3 caractères (« Imprimante » → `imp`, `mpr`, `pri`, `rim`…) et l'index GIN retrouve directement les tickets qui contiennent les morceaux recherchés. Côté code, la recherche reste un simple `contains` Prisma insensible à la casse ; PostgreSQL combine les deux index (`BitmapOr`).
-
-La recherche plein texte (`tsvector`) a été écartée : elle travaille sur des mots entiers (« 504 » ne trouve pas « ERR504 ») et dépend d'une langue (français ou anglais).
+La recherche porte sur des fragments (« imprim », « 504 ») dans le titre **ou** la description : un `ILIKE '%…%'` ne peut pas utiliser un index B-tree. L'extension `pg_trgm` découpe chaque texte en groupes de 3 caractères et l'index GIN retrouve directement les tickets qui les contiennent. La recherche plein texte (`tsvector`) a été écartée : elle travaille sur des mots entiers (« 504 » ne trouve pas « ERR504 »).
 
 ### Index volontairement absents
 
@@ -391,9 +364,7 @@ Les erreurs de validation ajoutent `details` (champ concerné et message). Les c
 | 429 | Trop de tentatives de connexion échouées | `TOO_MANY_REQUESTS` |
 | 500 | Erreur inattendue, sans trace technique renvoyée | `INTERNAL_ERROR` |
 
-`TICKET_MODIFIED` : le ticket a changé entre la vérification des règles et l'écriture (requête concurrente). L'API revérifie alors les règles sur l'état à jour pour renvoyer l'erreur précise ; ce code ne sert qu'en dernier recours.
-
-Pourquoi 409 : 400 signifie « requête mal formée, corrigez-la » ; 409 signifie « requête correcte, mais l'état actuel de la ressource l'interdit ». Le client sait précisément quoi faire.
+`TICKET_MODIFIED` ne sert qu'en dernier recours : le ticket a changé entre la vérification des règles et l'écriture (requête concurrente). Et 409 plutôt que 400, car la requête est correcte : c'est l'état actuel du ticket qui l'interdit.
 
 ## 10. Choix techniques
 
